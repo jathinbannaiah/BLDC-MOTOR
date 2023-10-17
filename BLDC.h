@@ -2,7 +2,7 @@
  * BLDC.h
  *
  *  Created on: 07-Sep-2023
- *      Author: Sarvjit
+ * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
  */
 
 #ifndef BLDC_H_
@@ -24,7 +24,7 @@
 
 //RECOATER MOTOR
 #define START 0x00000020      //B5
-
+                                                         //PE4 for PWM
 #define BRAKE 0x00000010      //B4
 
 #define DIR 0x00000008        //B3
@@ -37,9 +37,9 @@
 
 // ROLLER MOTOR
 #define START_R 0x00000001    //D0                      //We can use A port because it is interfering with uart communication
-
+                                                        //Using PF1 for PWM signal (the led on the tiva will glow red becuase pf1 is configured to it)
 #define BRAKE_R 0x00000002    //D1
-
+                                                        //Using PF1 to use a different PWM module
 #define DIR_R 0x00000004      //D2
 
 #define M0_R 0x00000008       //D3

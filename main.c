@@ -1,6 +1,6 @@
 /*
  * L298N H Bridge Driver using PWM
- * Sarvjit Ajit Patil 20862
+ * Sarvjit Ajit Patil and Praveen Bannaiah
  * Date : 08/08/2023
  */
 
@@ -121,12 +121,16 @@ int main(void)
 /* PWM is used as it triggers the ADC */
     M0PWM4_init(PWM_FRE);
     M0PWM5_init(PWM_FRE);
+    M1PWM5_init(PWM_FRE);
 
     M0PWM4_set(90/100);
     M0PWM4_set(set_duty);
 
     M0PWM5_set(90/100);
     M0PWM5_set(set_duty_R);
+
+    M1PWM5_set(90/100);
+    M1PWM5_set(set_duty_R);
 
 //    M0PWM4_start();
 //    M0PWM5_start();
@@ -188,7 +192,7 @@ int main(void)
                 Inst_Stop_R();
             }
 
-            else if(compare_str(RX0_BUF,"R STOP DC"))
+            else if(compare_str(RX0_BUF,"STOP DC"))
             {
                 Dec_Stop();
             }
@@ -340,7 +344,7 @@ int main(void)
                 sprintf(str,"RPM(float) Roller: %d.%d\n", i_f_rpm_r, f_f_rpm_r);
                 uart0_send_str(str);
 
-                M0PWM5_set(f_rpm_r);
+                M1PWM5_set(f_rpm_r);
 
 //                for(int i = 0; i < 3; i++)
 //                {

@@ -2,7 +2,7 @@
  * GPIO.c
  *
  *  Created on: 15-Apr-2023
- *      Author: Sarvjit
+ * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
  */
 #include<stdio.h>
 

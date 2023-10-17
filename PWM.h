@@ -2,7 +2,7 @@
  * PWM.h
  *
  *  Created on: 15-Apr-2023
- *      Author: Sarvjit
+ * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
  */
 
 #ifndef PWM_H_
@@ -25,6 +25,18 @@
 //
 //void PWM_Stop(void);
 
+
+//Module 1 PWM5
+
+void M1PWM5_init(int freq);
+
+void M1PWM5_start(void);
+
+void M1PWM5_stop(void);
+
+void M1PWM5_set(float dutycycle);
+
+void M1PWM5_set_freq(int freq);
 
 /*Module 0 PWM2*/
 

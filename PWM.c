@@ -2,7 +2,7 @@
  * PWM.c
  *
  *  Created on: 15-Apr-2023
- *      Author: Sarvjit
+ * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
  */
 
 #include <PWM.h>
@@ -13,8 +13,69 @@
 
 /* PWM PB4 M0PWM3 */
 
-/*--------------------------------------------M0PWM3--------------------------------------------*/
+/*--------------------------------------------M1PWM5--------------------------------------------*/
 
+void M1PWM5_init(int freq)
+{
+    // Enable the necessary clocks
+    SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;  // Enable PWM1
+    while((SYSCTL_RCGCPWM_R & SYSCTL_RCGCPWM_R1)==0){};
+    SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R5; // Enable GPIO Port F
+    while((SYSCTL_RCGCGPIO_R & SYSCTL_RCGCGPIO_R5)==0){};
+    SYSCTL_RCC_R |= (SYSCTL_RCC_USEPWMDIV | SYSCTL_RCC_PWMDIV_4);  // Set PWM clock divisor
+
+    // Configure GPIO PF1
+    GPIO_PORTF_AFSEL_R |= 0x02;  // Enable alternate function for PF1
+    GPIO_PORTF_PCTL_R |= GPIO_PCTL_PF1_M1PWM5;  // Configure PF1 as M1PWM5
+    GPIO_PORTF_DEN_R |= 0x02;  // Enable digital functionality for PF1
+
+    // Configure PWM1 Generator 2
+    PWM1_2_CTL_R &= ~0x00000001;  // Disable PWM1 Generator 2 during configuration
+    PWM1_2_CTL_R |= 0x00000002;   // Configure for down-count mode
+    PWM1_2_INTEN_R = (PWM_0_INTEN_TRCNTLOAD | PWM_0_INTEN_INTCNTLOAD);  // Enable interrupts
+    PWM1_2_GENB_R = 0x000000B0;  // Configure for PWM down-count mode with immediate updates
+    PWM1_2_LOAD_R = (125000 / freq);  // Set the load value for the desired frequency
+
+    float dutycycle_init = 0.5;
+    PWM1_2_CMPA_R = (1 - dutycycle_init) * (PWM1_2_LOAD_R);  // Set the initial duty cycle
+
+    // Enable PWM1 Generator 2
+    PWM1_2_CTL_R |= 0x00000001;
+    PWM1_ENABLE_R |= 0x20;  // Enable PWM output for M1PWM5
+}
+inline void M1PWM5_start(void)
+{
+    PWM1_2_CTL_R |= 0x00000001;
+    PWM1_ENABLE_R |= 0x20;
+}
+
+inline void M1PWM5_stop(void)
+{
+    PWM1_2_CTL_R &= ~0x00000001;
+    PWM1_ENABLE_R &= ~0x20;
+}
+
+inline void M1PWM5_set_freq(int freq)
+{
+    PWM1_2_CTL_R &= ~0x00000001;
+    PWM1_ENABLE_R &= ~0x20;
+    PWM1_2_LOAD_R = (125000 / freq);
+    float dutycycle_init = 0.5;
+    PWM1_2_CMPA_R = (1 - dutycycle_init) * PWM1_2_LOAD_R;
+    PWM1_ENABLE_R |= 0x20;
+    PWM1_2_CTL_R |= 0x00000001;
+}
+
+inline void M1PWM5_set(float dutycycle)
+{
+    PWM1_ENABLE_R &= ~0x20;
+    PWM1_2_CTL_R &= ~0x00000001;
+    PWM1_2_CMPA_R = (1 - dutycycle) * PWM1_2_LOAD_R - 1;
+    PWM1_2_CTL_R |= 0x00000001;
+    PWM1_ENABLE_R |= 0x20;
+}
+
+/*--------------------------------------------M0PWM3--------------------------------------------*/
 void M0PWM2_init(int freq)
 {
     //GPIO_PORTE_LOCK_R = 0x4C4F434B;

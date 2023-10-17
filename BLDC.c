@@ -2,7 +2,7 @@
  * BLDC.c
  *
  *  Created on: 07-Sep-2023
- *      Author: Sarvjit
+ * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
  */
 
 /*
@@ -67,7 +67,7 @@ void Inst_Stop_R()
     uart0_send_str("instant Roller stop\n");
 //    GPIO_PORTB_DATA_R &= ~ (START)
     GPIO_PORTD_DATA_R |= (BRAKE_R);
-    M0PWM5_stop();
+    M1PWM5_stop();
 }
 
 void Dec_Stop()
@@ -82,7 +82,7 @@ void Dec_Stop_R()
 {
     uart0_send_str("Dec Roller stop\n");
     GPIO_PORTD_DATA_R |= (START_R);
-    M0PWM5_stop();
+    M1PWM5_stop();
 }
 
 void Start()
@@ -97,7 +97,7 @@ void Start_R()
 {
     uart0_send_str("Start Roller\n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R);
-    M0PWM5_start();
+    M1PWM5_start();
 }
 
 void Brake()
@@ -111,7 +111,7 @@ void Brake_R()
 {
     uart0_send_str("stop Roller\n");
     GPIO_PORTD_DATA_R |= (START_R | BRAKE_R);
-    M0PWM5_stop();
+    M1PWM5_stop();
 }
 
 void Run_FW()
@@ -125,7 +125,7 @@ void Run_FW_R()
 {
     uart0_send_str("run Roller fw\n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R | DIR_R);
-    M0PWM5_start();
+    M1PWM5_start();
 }
 
 void Run_RV()
@@ -140,7 +140,7 @@ void Run_RV_R()
     uart0_send_str("Run Roller\n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R);
     GPIO_PORTD_DATA_R |= (DIR_R);
-    M0PWM5_start();
+    M1PWM5_start();
 }
 
 void Change_DIR(int dir)
