@@ -1,6 +1,6 @@
 /*
  * L298N H Bridge Driver using PWM
- * Sarvjit Ajit Patil and Praveen Bannaiah
+ * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
  * Date : 08/08/2023
  */
 
