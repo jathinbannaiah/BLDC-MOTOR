@@ -56,7 +56,7 @@ void BLDC_INIT_R(int mode)
 
 void Inst_Stop()
 {
-    uart0_send_str("isnt stop\n");
+    uart0_send_str("instANT stop\n");
 //    GPIO_PORTB_DATA_R &= ~ (START)
     GPIO_PORTB_DATA_R |= (BRAKE);
     M0PWM4_stop();
