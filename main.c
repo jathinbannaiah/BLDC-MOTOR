@@ -77,6 +77,8 @@ float pos = 0 ;
 long cur_cnt = 0 ;
 char str[100] ;
 
+int f1,f2,f3,f4,f5,f6,f7,f8,f9,f10;
+
 
 extern void PWM_Start(void);
 
@@ -101,10 +103,17 @@ int main(void)
     uart0_send_str("Welcome to UART0\n");
     uart0_send_str("This is for debugging.\n");
 
-    BLDC_INIT(0);
-    BLDC_INIT_R(0);
+    f1 = BLDC_INIT(0);
+    f2 = BLDC_INIT_R(0);
 
-    uart0_send_str("outside bldc initialisation\n");
+    if ((f1 == 1) && (f2 == 1))
+    {
+    uart0_send_str("BLDC motors successfully initialized\n");
+    }
+    else
+    {
+        printf("BLDC motors initialization failed");
+    }
 
 //    Run_FW();
 
@@ -119,18 +128,59 @@ int main(void)
     float set_duty = 0.9 ;
     float set_duty_R = 0.9 ;
 /* PWM is used as it triggers the ADC */
-    M0PWM4_init(PWM_FRE);
-    M0PWM5_init(PWM_FRE);
-    M1PWM5_init(PWM_FRE);
+    f3 = M0PWM4_init(PWM_FRE);
+    f4 = M0PWM5_init(PWM_FRE);
+    f5 = M1PWM5_init(PWM_FRE);
+
+    if (f3 == 1)
+        {
+            printf("MOPWM4 successfully initialized");
+        }
+    else
+        {
+            printf("M0PWM4 failed initialization");
+        }
+    if (f4 == 1)
+        {
+            printf("MOPWM5 successfully initialized");
+        }
+    else
+        {
+            printf("M0PWM5 failed initialization");
+        }
+    if (f5 == 1)
+        {
+            printf("M1PWM5 successfully initialized");
+        }
+    else
+        {
+            printf("M1PWM5 failed initialization");
+        }
 
     M0PWM4_set(90/100);
-    M0PWM4_set(set_duty);
+    f6 = M0PWM4_set(set_duty);
+    if (f6 == 1)
+        {
+            printf("M0PWM4 duty cycle successfully set ");
+        }
+    else
+        {
+            printf("M0PWM4 failed to set duty cycle");
+        }
 
     M0PWM5_set(90/100);
-    M0PWM5_set(set_duty_R);
+    f7 = M0PWM5_set(set_duty_R);
 
     M1PWM5_set(90/100);
-    M1PWM5_set(set_duty_R);
+    f8 = M1PWM5_set(set_duty_R);
+    if (f8 == 1)
+        {
+            printf("M1PWM5 duty cycle successfully set ");
+        }
+    else
+        {
+            printf("M1PWM5 failed to set duty cycle");
+        }
 
 //    M0PWM4_start();
 //    M0PWM5_start();
@@ -153,7 +203,7 @@ int main(void)
 //    ADC_1_SS_1_INIT();
 
 
-    uart0_send_str("going into loop\n");
+    uart0_send_str("Starting to read commands: \n");
 
     while(1)
     {
@@ -204,6 +254,7 @@ int main(void)
 
             else if(compare_str(RX0_BUF,"START"))
             {
+                uart0_send_str("Starting \n");
                 Start();
             }
 
@@ -255,9 +306,9 @@ int main(void)
 
             if(compare_str(cmd,"RPM"))     //Upper case RPM for Re-coater control
             {
-                uart0_send_str("RPM\n");
-                uart0_send_str(cmd);
-                uart0_send_char('\n');
+                uart0_send_str("setting RPM to Motor 1\n");
+                //uart0_send_str(cmd);
+                //uart0_send_char('\n');
 
                 char rpm[4] = {'\0'};
                 for(int i = 0; i < 4; i++)
@@ -269,15 +320,15 @@ int main(void)
                 uart0_send_char('\n');
 
                 int i_rpm = atoi(rpm);
-                sprintf(str,"RPM: %d\n", i_rpm);
-                uart0_send_str(str);
+                //sprintf(str,"RPM: %d\n", i_rpm);
+                //uart0_send_str(str);
 
                 float f_rpm = map(i_rpm,100, 3150, 0.12, 0.97);
 //                float f_rpm;
 //                f_rpm = i_rpm/100;
 
-                sprintf(str,"RPM(map): %d\n", i_rpm);
-                uart0_send_str(str);
+                //sprintf(str,"RPM(map): %d\n", i_rpm);
+               // uart0_send_str(str);
 
                 int ii_f_rpm = f_rpm * 100 ;
                 int i_f_rpm = ii_f_rpm / 100 ;
@@ -310,38 +361,31 @@ int main(void)
 
             else if(compare_str(cmd,"rpm"))     //Lower case RPM for Re-coater control
             {
-                uart0_send_str("RPM Roller Control\n");
-                uart0_send_str(cmd);
-                uart0_send_char('\n');
+                uart0_send_str("Setting RPM Motor 2\n");
+                //uart0_send_str(cmd);
+                //uart0_send_char('\n');
 
                 char r[4] = {'\0'};
-                for(int j = 0; j < 4; j++)
-                {
-                    sprintf(str,"jj %c", r[j]);
-                    uart0_send_str(str);
-                    r[j] = RX0_BUF[j+4];
-                    uart0_send_char('\n');
-                }
 
-                uart0_send_str(r);
-                uart0_send_char('\n');
+                //uart0_send_str(r);
+                //uart0_send_char('\n');
 
                 int i_rpm_r = atoi(r);
-                sprintf(str,"RPM Roller: %d\n", i_rpm_r);
-                uart0_send_str(str);
+                //sprintf(str,"RPM Roller: %d\n", i_rpm_r);
+                //uart0_send_str(str);
 
                 float f_rpm_r = map(i_rpm_r,100, 3150, 0.12, 0.97);
 //                float f_rpm;     M0PWM5_set(f_rpm);
 //                f_rpm = i_rpm/100;
 
-                sprintf(str,"RPM(map) Roller: %d\n", i_rpm_r);
-                uart0_send_str(str);
+                //sprintf(str,"RPM(map) Roller: %d\n", i_rpm_r);
+                //uart0_send_str(str);
 
                 int ii_f_rpm_r = f_rpm_r * 100 ;
                 int i_f_rpm_r = ii_f_rpm_r / 100 ;
                 int f_f_rpm_r = ii_f_rpm_r % 100 ;
 
-                sprintf(str,"RPM(float) Roller: %d.%d\n", i_f_rpm_r, f_f_rpm_r);
+                sprintf(str,"RPM(float): %d.%d\n", i_f_rpm_r, f_f_rpm_r);
                 uart0_send_str(str);
 
                 M1PWM5_set(f_rpm_r);

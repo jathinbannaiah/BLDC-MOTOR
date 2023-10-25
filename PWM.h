@@ -28,13 +28,13 @@
 
 //Module 1 PWM5
 
-void M1PWM5_init(int freq);
+int M1PWM5_init(int freq);
 
 void M1PWM5_start(void);
 
 void M1PWM5_stop(void);
 
-void M1PWM5_set(float dutycycle);
+int M1PWM5_set(float dutycycle);
 
 void M1PWM5_set_freq(int freq);
 
@@ -66,25 +66,25 @@ void M0PWM3_init(int freq);
 
 /*Module 0 PWM4*/
 
-void M0PWM4_init(int freq);
+int M0PWM4_init(int freq);
 
  void M0PWM4_start(void);
 
  void M0PWM4_stop(void);
 
- void M0PWM4_set(float dutycycle);
+int M0PWM4_set(float dutycycle);
 
  void M0PWM4_set_freq(int freq);
 
 /*Module 0 PWM5*/
 
-void M0PWM5_init(int freq);
+int M0PWM5_init(int freq);
 
  void M0PWM5_start(void);
 
  void M0PWM5_stop(void);
 
- void M0PWM5_set(float dutycycle);
+int M0PWM5_set(float dutycycle);
 
  void M0PWM5_set_freq(int freq);
 

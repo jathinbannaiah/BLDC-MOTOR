@@ -32,31 +32,37 @@
 #include"PWM.h"
 #endif
 
-void BLDC_INIT(int mode)
-{
-    uart0_send_str("bldc iNIT\n");
-    GPIOB_INIT();
-    uart0_send_str("After GPIOB_Init\n");
+int temp;
 
-    set_Mode(mode);
-    uart0_send_str("after set mode\n");
+int BLDC_INIT(int mode)
+{
+    uart0_send_str("Initialising BLDC motor 1\n");
+    GPIOB_INIT();
+    uart0_send_str("Successfully Initialized Port B\n");
+
+    temp = set_Mode(mode);
+    uart0_send_str("Successfully set motor 1 mode\n");
 
     GPIO_PORTB_DATA_R |= (START | BRAKE);
+    return 1;
 }
 
-void BLDC_INIT_R(int mode)
+int BLDC_INIT_R(int mode)
 {
-    uart0_send_str("bldc roller iNIT  \n");
+    uart0_send_str("Initialising BLDC motor 2\n");
     GPIOD_INIT();
-    uart0_send_str("After GPIOA_Init\n");
-    set_Mode_R(mode);
-    uart0_send_str("outside set mode r\n");
+    uart0_send_str("Successfully Initialized Port D\n");
+    temp = set_Mode_R(mode);
+    uart0_send_str("Successfully set motor 2 mode\n");
     GPIO_PORTD_DATA_R |= (START_R | BRAKE_R);
+
+    return 1;
+
 }
 
 void Inst_Stop()
 {
-    uart0_send_str("instANT stop\n");
+    uart0_send_str("Instantaneously stopping Motor 1\n");
 //    GPIO_PORTB_DATA_R &= ~ (START)
     GPIO_PORTB_DATA_R |= (BRAKE);
     M0PWM4_stop();
@@ -64,7 +70,7 @@ void Inst_Stop()
 
 void Inst_Stop_R()
 {
-    uart0_send_str("instant Roller stop\n");
+    uart0_send_str("Instantaneously stopping Motor 2\n");
 //    GPIO_PORTB_DATA_R &= ~ (START)
     GPIO_PORTD_DATA_R |= (BRAKE_R);
     M1PWM5_stop();
@@ -72,7 +78,7 @@ void Inst_Stop_R()
 
 void Dec_Stop()
 {
-    uart0_send_str("Dec stop\n");
+    uart0_send_str("Decelerating stop, Motor 1\n");
     GPIO_PORTB_DATA_R |= (START);
     M0PWM4_stop();
 
@@ -80,14 +86,14 @@ void Dec_Stop()
 
 void Dec_Stop_R()
 {
-    uart0_send_str("Dec Roller stop\n");
+    uart0_send_str("Decelerating stop, Motor 2\n");
     GPIO_PORTD_DATA_R |= (START_R);
     M1PWM5_stop();
 }
 
 void Start()
 {
-    uart0_send_str("Start\n");
+    uart0_send_str("Starting Motor 1\n");
     GPIO_PORTB_DATA_R &= ~ (START | BRAKE);
     M0PWM4_start();
 
@@ -95,28 +101,28 @@ void Start()
 
 void Start_R()
 {
-    uart0_send_str("Start Roller\n");
+    uart0_send_str("Starting Motor 2\n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R);
     M1PWM5_start();
 }
 
 void Brake()
 {
-    uart0_send_str("stop\n");
+    uart0_send_str("Stopping Motor 1\n");
     GPIO_PORTB_DATA_R |= (START | BRAKE);
     M0PWM4_stop();
 }
 
 void Brake_R()
 {
-    uart0_send_str("stop Roller\n");
+    uart0_send_str("Stopping Motor 2\n");
     GPIO_PORTD_DATA_R |= (START_R | BRAKE_R);
     M1PWM5_stop();
 }
 
 void Run_FW()
 {
-    uart0_send_str("run fw\n");
+    uart0_send_str("Motor 1: Run Forward \n");
     GPIO_PORTB_DATA_R &= ~ (START | BRAKE | DIR);
     M0PWM4_start();
 }
@@ -137,7 +143,7 @@ void Run_RV()
 }
 void Run_RV_R()
 {
-    uart0_send_str("Run Roller\n");
+    uart0_send_str("Motor 2: Run Forward \n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R);
     GPIO_PORTD_DATA_R |= (DIR_R);
     M1PWM5_start();
@@ -145,6 +151,7 @@ void Run_RV_R()
 
 void Change_DIR(int dir)
 {
+    uart0_send_str("Motor 1: Change Direction \n");
     Dec_Stop();
     if(dir)
     {
@@ -160,6 +167,7 @@ void Change_DIR(int dir)
 
 void Change_DIR_R(int dir)
 {
+    uart0_send_str("Motor 2: Change Direction \n");
     Dec_Stop_R();
     if(dir)
     {
@@ -173,35 +181,42 @@ void Change_DIR_R(int dir)
     Start_R();
 }
 
-void set_Mode(int mode)
+int set_Mode(int mode)
 {
     switch(mode)
     {
     case 0:
         GPIO_PORTB_DATA_R |=  (M0 | M1) ;
+        return 0;
         break;
 
     case 1:
         GPIO_PORTB_DATA_R &= ~ (M0) ;
         GPIO_PORTB_DATA_R |=  (M1) ;
+        return 1;
         break;
 
     case 2:
         GPIO_PORTB_DATA_R &= ~ (M1) ;
         GPIO_PORTB_DATA_R |=  (M0) ;
+        return 2;
         break;
 
     case 3:
         GPIO_PORTB_DATA_R &= ~ (M0 | M1) ;
+        return 3;
         break;
 
     case 4:
+        return -1;
         break;
 
     case 5:
+        return -1;
         break;
 
     case 6:
+        return -1;
         break;
 
 
@@ -209,47 +224,55 @@ void set_Mode(int mode)
         break;
 
     }
+    return -1;
 
 }
 
-void set_Mode_R(int mode)
+int set_Mode_R(int mode)
 {
     switch(mode)
     {
     case 0:
-        uart0_send_str("case 0\n");
         GPIO_PORTD_DATA_R |=  (M0_R | M1_R) ;
+        return 0;
         break;
 
     case 1:
-        uart0_send_str("case 1\n");
         GPIO_PORTD_DATA_R &= ~ (M0_R) ;
         GPIO_PORTD_DATA_R |=  (M1_R) ;
+        return 1;
         break;
 
     case 2:
         GPIO_PORTD_DATA_R &= ~ (M1_R) ;
         GPIO_PORTD_DATA_R |=  (M0_R) ;
+        return 2;
         break;
 
     case 3:
         GPIO_PORTD_DATA_R &= ~ (M0_R | M1_R) ;
+        return 3;
         break;
 
     case 4:
+        return -1;
         break;
 
     case 5:
+        return -1;
         break;
 
     case 6:
+        return -1;
         break;
 
 
     case 7:
+        return -1;
         break;
 
     }
+    return -1;
 
 }
 

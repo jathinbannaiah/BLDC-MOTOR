@@ -50,7 +50,7 @@
 
 
 //RECOATER FUNCTIONS
-void BLDC_INIT(int mode);
+int BLDC_INIT(int mode);
 
 void Inst_Stop();
 
@@ -66,10 +66,10 @@ void Run_RV();
 
 void Change_DIR(int dir);
 
-void set_Mode(int mode);
+int set_Mode(int mode);
 
 //ROLLER FUNCTIONS
-void BLDC_INIT_R(int mode);
+int BLDC_INIT_R(int mode);
 
 void Inst_Stop_R();
 
@@ -85,4 +85,4 @@ void Run_RV_R();
 
 void Change_DIR_R(int dir);
 
-void set_Mode_R(int mode);
+int set_Mode_R(int mode);

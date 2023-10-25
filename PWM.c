@@ -15,8 +15,10 @@
 
 /*--------------------------------------------M1PWM5--------------------------------------------*/
 
-void M1PWM5_init(int freq)
+int M1PWM5_init(int freq)
 {
+    uart0_send_str("Initializing M1PWM5\n");
+
     // Enable the necessary clocks
     SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;  // Enable PWM1
     while((SYSCTL_RCGCPWM_R & SYSCTL_RCGCPWM_R1)==0){};
@@ -42,6 +44,8 @@ void M1PWM5_init(int freq)
     // Enable PWM1 Generator 2
     PWM1_2_CTL_R |= 0x00000001;
     PWM1_ENABLE_R |= 0x20;  // Enable PWM output for M1PWM5
+
+    return 1;
 }
 inline void M1PWM5_start(void)
 {
@@ -54,7 +58,6 @@ inline void M1PWM5_stop(void)
     PWM1_2_CTL_R &= ~0x00000001;
     PWM1_ENABLE_R &= ~0x20;
 }
-
 inline void M1PWM5_set_freq(int freq)
 {
     PWM1_2_CTL_R &= ~0x00000001;
@@ -66,13 +69,14 @@ inline void M1PWM5_set_freq(int freq)
     PWM1_2_CTL_R |= 0x00000001;
 }
 
-inline void M1PWM5_set(float dutycycle)
+inline int M1PWM5_set(float dutycycle)
 {
     PWM1_ENABLE_R &= ~0x20;
     PWM1_2_CTL_R &= ~0x00000001;
     PWM1_2_CMPA_R = (1 - dutycycle) * PWM1_2_LOAD_R - 1;
     PWM1_2_CTL_R |= 0x00000001;
     PWM1_ENABLE_R |= 0x20;
+    return 1;
 }
 
 /*--------------------------------------------M0PWM3--------------------------------------------*/
@@ -254,8 +258,10 @@ inline void M0PWM3_set(float dutycycle)
 
 /*--------------------------------------------M0PWM4--------------------------------------------*/
 
-void M0PWM4_init(int freq)
+int M0PWM4_init(int freq)
 {
+    uart0_send_str("Initializing M0PWM4\n");
+
     //GPIO_PORTE_LOCK_R = 0x4C4F434B;
     SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R0 ;
     while((SYSCTL_RCGCPWM_R & SYSCTL_RCGCPWM_R0)==0){};
@@ -307,6 +313,7 @@ void M0PWM4_init(int freq)
     PWM0_2_CTL_R |= 0x00000001 ;
     PWM0_ENABLE_R |= 0x10 ;               //Used to enable the PWM generator
 
+    return 1;
 }
 
 inline void M0PWM4_start(void)
@@ -340,7 +347,7 @@ inline void M0PWM4_set_freq(int freq)
     PWM0_2_CTL_R |= 0x00000001 ;
 }
 
-inline void M0PWM4_set(float dutycycle)
+inline int M0PWM4_set(float dutycycle)
 {
 //    if( dutycycle == 0 )
 //    {
@@ -352,14 +359,15 @@ inline void M0PWM4_set(float dutycycle)
 //        PWM0_2_CMPA_R = ( 1-dutycycle )*(PWM0_2_LOAD_R) + 1 ; // //
 //    }
 //    else
-    {
+
         PWM0_ENABLE_R &= ~ 0x10 ;
         PWM0_2_CTL_R &= ~0x00000001 ;
         PWM0_2_CMPA_R = ( 1-dutycycle )*(PWM0_2_LOAD_R) - 1  ; // //
         PWM0_2_CTL_R |= 0x00000001 ;
         PWM0_ENABLE_R |= 0x10 ;
 
-    }
+
+        return 1;
 }
 
 
@@ -368,8 +376,9 @@ inline void M0PWM4_set(float dutycycle)
 
 /*--------------------------------------------M0PWM5--------------------------------------------*/
 
-void M0PWM5_init(int freq)
+int M0PWM5_init(int freq)
 {
+    uart0_send_str("Initializing M0PWM5\n");
     SYSCTL_RCGC0_R |= 0x00100000 ;
     //GPIO_PORTE_LOCK_R = 0x4C4F434B;
     SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R0 ;            //enables pwn module 0
@@ -418,6 +427,8 @@ void M0PWM5_init(int freq)
     PWM0_ENABLE_R |= 0x20 ;
 //    PWM0_INVERT_R |= 0x20 ;
 
+    return 1;
+
 }
 
 inline void M0PWM5_start(void)
@@ -451,7 +462,7 @@ inline void M0PWM5_set_freq(int freq)
     PWM0_ENABLE_R |= 0x20 ;
 }
 
-inline void M0PWM5_set(float dutycycle)
+inline int M0PWM5_set(float dutycycle)
 {
 //    if( dutycycle == 0 )
 //    {
@@ -470,7 +481,7 @@ inline void M0PWM5_set(float dutycycle)
     PWM0_2_CMPA_R = ( 1-dutycycle )*(PWM0_2_LOAD_R) ; // //
     PWM0_2_CTL_R |= 0x00000001 ;
     PWM0_ENABLE_R |= 0x20 ;
-
+    return 1;
 
 //    }
 }
