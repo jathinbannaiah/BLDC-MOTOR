@@ -34,29 +34,29 @@
 
 void BLDC_INIT(int mode)
 {
-    uart0_send_str("bldc iNIT\n");
+    uart0_send_str("Initialising BLDC motor 1\n");
     GPIOB_INIT();
-    uart0_send_str("After GPIOB_Init\n");
+    //uart0_send_str("After GPIOB_Init\n");
 
     set_Mode(mode);
-    uart0_send_str("after set mode\n");
+    //uart0_send_str("after set mode\n");
 
     GPIO_PORTB_DATA_R |= (START | BRAKE);
 }
 
 void BLDC_INIT_R(int mode)
 {
-    uart0_send_str("bldc roller iNIT  \n");
+    uart0_send_str("Initialising BLDC motor 2\n");
     GPIOD_INIT();
-    uart0_send_str("After GPIOA_Init\n");
+    //uart0_send_str("After GPIOA_Init\n");
     set_Mode_R(mode);
-    uart0_send_str("outside set mode r\n");
+    //uart0_send_str("outside set mode r\n");
     GPIO_PORTD_DATA_R |= (START_R | BRAKE_R);
 }
 
 void Inst_Stop()
 {
-    uart0_send_str("instANT stop\n");
+    uart0_send_str("Instantaneously stopping Motor 1\n");
 //    GPIO_PORTB_DATA_R &= ~ (START)
     GPIO_PORTB_DATA_R |= (BRAKE);
     M0PWM4_stop();
@@ -64,7 +64,7 @@ void Inst_Stop()
 
 void Inst_Stop_R()
 {
-    uart0_send_str("instant Roller stop\n");
+    uart0_send_str("Instantaneously stopping Motor 2\n");
 //    GPIO_PORTB_DATA_R &= ~ (START)
     GPIO_PORTD_DATA_R |= (BRAKE_R);
     M1PWM5_stop();
@@ -72,7 +72,7 @@ void Inst_Stop_R()
 
 void Dec_Stop()
 {
-    uart0_send_str("Dec stop\n");
+    uart0_send_str("Decelerating stop, Motor 1\n");
     GPIO_PORTB_DATA_R |= (START);
     M0PWM4_stop();
 
@@ -80,14 +80,14 @@ void Dec_Stop()
 
 void Dec_Stop_R()
 {
-    uart0_send_str("Dec Roller stop\n");
+    uart0_send_str("Decelerating stop, Motor 2\n");
     GPIO_PORTD_DATA_R |= (START_R);
     M1PWM5_stop();
 }
 
 void Start()
 {
-    uart0_send_str("Start\n");
+    uart0_send_str("Starting Motor 1\n");
     GPIO_PORTB_DATA_R &= ~ (START | BRAKE);
     M0PWM4_start();
 
@@ -95,49 +95,49 @@ void Start()
 
 void Start_R()
 {
-    uart0_send_str("Start Roller\n");
+    uart0_send_str("Starting Motor 2\n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R);
     M1PWM5_start();
 }
 
 void Brake()
 {
-    uart0_send_str("stop\n");
+    uart0_send_str("Stopping Motor 1\n");
     GPIO_PORTB_DATA_R |= (START | BRAKE);
     M0PWM4_stop();
 }
 
 void Brake_R()
 {
-    uart0_send_str("stop Roller\n");
+    uart0_send_str("Stopping Motor 2\n");
     GPIO_PORTD_DATA_R |= (START_R | BRAKE_R);
     M1PWM5_stop();
 }
 
 void Run_FW()
 {
-    uart0_send_str("run fw\n");
+    uart0_send_str("Motor 1: Run Forward \n");
     GPIO_PORTB_DATA_R &= ~ (START | BRAKE | DIR);
     M0PWM4_start();
 }
 
 void Run_FW_R()
 {
-    uart0_send_str("run Roller fw\n");
+    uart0_send_str("Motor 2: Run Forward \n\n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R | DIR_R);
     M1PWM5_start();
 }
 
 void Run_RV()
 {
-    uart0_send_str("Run Recoater\n");
+    uart0_send_str("Motor 1: Run Reverse\n");
     GPIO_PORTB_DATA_R &= ~ (START | BRAKE);
     GPIO_PORTB_DATA_R |= (DIR);
     M0PWM4_start();
 }
 void Run_RV_R()
 {
-    uart0_send_str("Run Roller\n");
+    uart0_send_str("Motor 2: Run Reverse\n");
     GPIO_PORTD_DATA_R &= ~ (START_R | BRAKE_R);
     GPIO_PORTD_DATA_R |= (DIR_R);
     M1PWM5_start();
@@ -145,6 +145,7 @@ void Run_RV_R()
 
 void Change_DIR(int dir)
 {
+    uart0_send_str("Motor 1: Change Direction \n");
     Dec_Stop();
     if(dir)
     {
@@ -160,6 +161,7 @@ void Change_DIR(int dir)
 
 void Change_DIR_R(int dir)
 {
+    uart0_send_str("Motor 2: Change Direction \n");
     Dec_Stop_R();
     if(dir)
     {

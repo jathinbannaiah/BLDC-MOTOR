@@ -45,9 +45,9 @@
 //#include"timer.h"
 //#endif
 
-#ifndef STEPPER_H_
-#include"stepper.h"
-#endif
+//#ifndef STEPPER_H_
+//#include"stepper.h"
+//#endif
 
 #ifndef BLDC_H_
 #include"BLDC.h"
@@ -77,6 +77,8 @@ float pos = 0 ;
 long cur_cnt = 0 ;
 char str[100] ;
 
+int f1,f2,f3,f4,f5,f6,f7,f8,f9,f10;
+
 
 extern void PWM_Start(void);
 
@@ -104,7 +106,6 @@ int main(void)
     BLDC_INIT(0);
     BLDC_INIT_R(0);
 
-    uart0_send_str("outside bldc initialisation\n");
 
 //    Run_FW();
 
@@ -153,7 +154,7 @@ int main(void)
 //    ADC_1_SS_1_INIT();
 
 
-    uart0_send_str("going into loop\n");
+    uart0_send_str("Starting to read commands: \n");
 
     while(1)
     {
@@ -209,7 +210,6 @@ int main(void)
 
             else if(compare_str(RX0_BUF,"R START"))
             {
-                uart0_send_str("CALLING R START FUNCTION\n");
 
                 Start_R();
             }
@@ -255,9 +255,10 @@ int main(void)
 
             if(compare_str(cmd,"RPM"))     //Upper case RPM for Re-coater control
             {
-                uart0_send_str("RPM\n");
-                uart0_send_str(cmd);
-                uart0_send_char('\n');
+                //uart0_send_str("RPM\n");
+                //uart0_send_str(cmd);
+                //uart0_send_char('\n');
+                uart0_send_str("setting RPM to Motor 1\n");
 
                 char rpm[4] = {'\0'};
                 for(int i = 0; i < 4; i++)
@@ -269,8 +270,8 @@ int main(void)
                 uart0_send_char('\n');
 
                 int i_rpm = atoi(rpm);
-                sprintf(str,"RPM: %d\n", i_rpm);
-                uart0_send_str(str);
+                //sprintf(str,"RPM: %d\n", i_rpm);
+                //uart0_send_str(str);
 
                 float f_rpm = map(i_rpm,100, 3150, 0.12, 0.97);
 //                float f_rpm;
@@ -310,9 +311,10 @@ int main(void)
 
             else if(compare_str(cmd,"rpm"))     //Lower case RPM for Re-coater control
             {
-                uart0_send_str("RPM Roller Control\n");
-                uart0_send_str(cmd);
-                uart0_send_char('\n');
+                //uart0_send_str("RPM Roller Control\n");
+                //uart0_send_str(cmd);
+                //uart0_send_char('\n');
+                uart0_send_str("setting RPM to Motor 2\n");
 
                 char r[4] = {'\0'};
                 for(int j = 0; j < 4; j++)
@@ -327,8 +329,8 @@ int main(void)
                 uart0_send_char('\n');
 
                 int i_rpm_r = atoi(r);
-                sprintf(str,"RPM Roller: %d\n", i_rpm_r);
-                uart0_send_str(str);
+                //sprintf(str,"RPM Roller: %d\n", i_rpm_r);
+                //uart0_send_str(str);
 
                 float f_rpm_r = map(i_rpm_r,100, 3150, 0.12, 0.97);
 //                float f_rpm;     M0PWM5_set(f_rpm);
