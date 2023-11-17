@@ -1,0 +1,19 @@
+//ALL COMMANDS ARE CASE SENSITIVE
+FIRST MOTOR
+    1. START
+    2. BRAKE
+    3. STOP DC
+    4. STOP IN
+    5. RUN FW
+    6. RUN RV
+    7. RPM <value 1000-3150>
+
+
+SECOND MOTOR
+    1. R START
+    2. R BRAKE
+    3. R STOP DC
+    4. R STOP IN
+    5. R RUN FW
+    6. R RUN RV
+    7. rpm <value 1000-3150>

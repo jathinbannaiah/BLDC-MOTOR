@@ -48,7 +48,10 @@ void GPIOA_INIT(void)
 
     while((SYSCTL_PRGPIO_R & 0x01) == 0){}; // Wait for clock to stabilize
 
-    GPIO_PORTA_DIR_R |= 0x000000FF ;    /*  GPIO Direction | 0 -> INPUT | 1 -> OUTPUT */
+
+    GPIO_PORTA_DIR_R |= 0x000000F0 ;    /*  GPIO Direction | 0 -> INPUT | 1 -> OUTPUT */
+
+
 
 //    GPIO_PORTA_DIR_R &= ~ 0x000000E1 ;
 
@@ -56,9 +59,13 @@ void GPIOA_INIT(void)
 
     GPIO_PORTA_AFSEL_R |= 0x00000000 ;  /* Disable alternate function on PORT */
 
+
     GPIO_PORTA_AMSEL_R |= 0x00000000 ;  /* Disable analog function on PORT */
 
+
     GPIO_PORTA_PCTL_R &= ~ 0xFFFFFFFF ; /* Regular digital function */
+
+
 
     /* DRIVE STRENGTH of PORT A */
 
@@ -76,7 +83,13 @@ void GPIOA_INIT(void)
 
     GPIO_PORTA_DEN_R |= 0xFF;       /* enable the GPIO pins for digital function */
 
-    GPIO_PORTA_DATA_R |= 0x00000000 ;
+    GPIO_PORTA_DATA_R |= 0x0000000F;
+    //uart0_send_str("Mind an");
+    //GPIO_PORTA_PUR_R &= 0x00;    // Enable pull-up resistor on PA2
+    //GPIO_PORTA_PUR_R &= 0x00;    // Enable pull-up resistor on PA2
+    //GPIO_PORTA_PUR_R |= 0x02;    // Enable pull-up resistor on PA2
+    //GPIO_PORTA_PUR_R |= 0x04;    // Enable pull-up resistor on PA2
+    uart0_send_str("GPIO port A initialization complete \n");
 
     /* INTERRUPTS on PORT A */
 
@@ -118,6 +131,7 @@ void GPIOB_INIT(void)
 
     GPIO_PORTB_DIR_R |= 0x0000003F ;    /*  GPIO Direction | 0 -> INPUT | 1 -> OUTPUT */
 
+
 //    GPIO_PORTB_DIR_R &= ~0xE0 ;
 
 //    GPIO_PORTB_LOCK_R = 0x4C4F434B;     /* unlock commit register */
@@ -146,7 +160,12 @@ void GPIOB_INIT(void)
 
     GPIO_PORTB_DATA_R |= 0x00000000 ;
 
-    /* INTERRUPTS on PORT A */
+    GPIO_PORTB_PUR_R &= 0x0;
+    GPIO_PORTB_PUR_R |= 0xC0;
+
+
+
+    /* INTERRUPTS on PORT B */
 
 //    EnableInterrupts() ;             /* Enable global Interrupt flag (I) */
 //
@@ -155,92 +174,99 @@ void GPIOB_INIT(void)
 //    NVIC_EN0_R |= 0x00000002 ;        /*  Enable interrupt 16 in NVIC */
 //
 //
-//    GPIO_PORTB_IS_R &= ~0xA0 ;      /* 0 -> The edge on the corresponding pin is detected (edge-sensitive)
+//    GPIO_PORTB_IS_R &= ~0xC0 ;      /* 0 -> The edge on the corresponding pin is detected (edge-sensitive)
 //                                       1 -> The level on the corresponding pin is detected (level-sensitive)*/
 //
-//    GPIO_PORTB_IBE_R &= ~0xA0 ;     /* 0 -> Interrupt generation is controlled by the GPIO Interrupt Event (GPIOIEV) register (see page 666).
+//    GPIO_PORTB_IBE_R &= ~0xC0 ;     /* 0 -> Interrupt generation is controlled by the GPIO Interrupt Event (GPIOIEV) register (see page 666).
 //                                       1 -> Both edges on the corresponding pin trigger an interrupt */
 //
-//    GPIO_PORTB_IEV_R &= ~0xA0 ;     /* 0 -> A falling edge or a Low level on the corresponding pin triggers an interrupt.
+//    GPIO_PORTB_IEV_R &= ~0xC0 ;     /* 0 -> A falling edge or a Low level on the corresponding pin triggers an interrupt.
 //                                       1 -> A rising edge or a High level on the corresponding pin triggers an interrupt */
+
+//    GPIO_PORTB_ICR_R |= 0xA0 ;      /* 0 -> The corresponding interrupt is unaffected.
+    //                                       1 -> The corresponding interrupt is cleared */
+
+//    NVIC_EN0_R |= 0x00000002 ;        /*  Enable interrupt 16 in NVIC */
+
+ //   NVIC_PRI0_R = (NVIC_PRI0_R & 0xFFFF1FFF) | 0x00008000 ; /*  priority 5 */
 //
-//    GPIO_PORTB_IM_R |= 0x80 ;       /* 0 -> The interrupt from the corresponding pin is masked.
+//    GPIO_PORTB_IM_R |= 0xC0 ;       /* 0 -> The interrupt from the corresponding pin is masked.
 //                                       1 -> The interrupt from the corresponding pin is sent to the interrupt controller */
 //
 //    GPIO_PORTB_ICR_R |= 0xA0 ;      /* 0 -> The corresponding interrupt is unaffected.
 //                                       1 -> The corresponding interrupt is cleared */
+
 }
 
 void GPIOC_INIT(void)
-{
-    /* Do no use PC[3:0] */
+{         /* Do no use PC[3:0] */
 
-//    SYSCTL_RCGCGPIO_R |= 0x34;      // Enable clock to GPIO PORTC, PORTE and PORTF
-//    GPIO_PORTC_DIR_R |= 0x00;       // Set PC 4-7 as input
-//    GPIO_PORTE_DIR_R |= 0x01;       // Set PE 0 as output
-//    GPIO_PORTC_DEN_R |= 0xF0;       // Digital Enable PC 4-7
-//    GPIO_PORTE_DEN_R |= 0x01;       // Digital Enable PE 0
-//    GPIO_PORTC_PUR_R |= 0xF0;       // Enable Pull Up Resistors for input PORTC 4-7
-//    //led
-//    GPIO_PORTF_DIR_R = 0x0E;        // Enable the GPIO pins for the LED (PF3, 2 1) as output
-//    GPIO_PORTF_DEN_R = 0x0E;        // Enable the GPIO pins for digital function
+    //    SYSCTL_RCGCGPIO_R |= 0x34;      // Enable clock to GPIO PORTC, PORTE and PORTF
+    //    GPIO_PORTC_DIR_R |= 0x00;       // Set PC 4-7 as input
+    //    GPIO_PORTE_DIR_R |= 0x01;       // Set PE 0 as output
+    //    GPIO_PORTC_DEN_R |= 0xF0;       // Digital Enable PC 4-7
+    //    GPIO_PORTE_DEN_R |= 0x01;       // Digital Enable PE 0
+    //    GPIO_PORTC_PUR_R |= 0xF0;       // Enable Pull Up Resistors for input PORTC 4-7
+    //    //led
+    //    GPIO_PORTF_DIR_R = 0x0E;        // Enable the GPIO pins for the LED (PF3, 2 1) as output
+    //    GPIO_PORTF_DEN_R = 0x0E;        // Enable the GPIO pins for digital function
 
-    SYSCTL_RCGC2_R |= 0x00000004 ;       /* Enable clock to GPIO_C_ at clock gating control register */
+        SYSCTL_RCGC2_R |= 0x00000004 ;       /* Enable clock to GPIO_C_ at clock gating control register */
 
-    SYSCTL_RCGCGPIO_R |= 0x00000004 ;    /* Enable and provide a clock to GPIO Port_C_ in Run mode */
+        SYSCTL_RCGCGPIO_R |= 0x00000004 ;    /* Enable and provide a clock to GPIO Port_C_ in Run mode */
 
-//    GPIO_PORTC_CR_R |= 0xFFFFFFFF ;     /* 1 -> The corresponding GPIOAFSEL, GPIOPUR, GPIOPDR, or GPIODEN bits can be written */
+    //    GPIO_PORTC_CR_R |= 0xFFFFFFFF ;     /* 1 -> The corresponding GPIOAFSEL, GPIOPUR, GPIOPDR, or GPIODEN bits can be written */
 
-    GPIO_PORTC_DIR_R &= ~ 0xF0 ;    /*  GPIO Direction | 0 -> INPUT | 1 -> OUTPUT */
+        GPIO_PORTC_DIR_R &= ~ 0xF0 ;    /*  GPIO Direction | 0 -> INPUT | 1 -> OUTPUT */
 
-//    GPIO_PORTC_LOCK_R = 0x4C4F434B;     /* unlock commit register */
+    //    GPIO_PORTC_LOCK_R = 0x4C4F434B;     /* unlock commit register */
 
-//    GPIO_PORTC_AFSEL_R |= 0x00 ;  /* Disable alternate function on PORT */
+    //    GPIO_PORTC_AFSEL_R |= 0x00 ;  /* Disable alternate function on PORT */
 
-//    GPIO_PORTC_AMSEL_R |= 0x00 ;  /* Disable analog function on PORT */
+    //    GPIO_PORTC_AMSEL_R |= 0x00 ;  /* Disable analog function on PORT */
 
-//    GPIO_PORTC_PCTL_R &= ~ 0xF0 ; /* Regular digital function */
+    //    GPIO_PORTC_PCTL_R &= ~ 0xF0 ; /* Regular digital function */
 
-    /* DRIVE STRENGTH of PORT A */
+        /* DRIVE STRENGTH of PORT A */
 
-//    GPIO_PORTC_DR2R_R |= 0x00000000 ;   /* 1 -> The corresponding GPIO pin has 2-mA drive */
-//
-//    GPIO_PORTC_DR4R_R |= 0x00000000 ;   /* 1 -> The corresponding GPIO pin has 4-mA drive */
-//
-//    GPIO_PORTC_DR8R_R |= 0x00000000 ;   /* 1 -> The corresponding GPIO pin has 8-mA drive */
-//
-//    GPIO_PORTC_ODR_R |= 0x00 ;    /* 1 -> The corresponding pin is configured as open drain */
-//
-    GPIO_PORTC_DEN_R |= 0xF0;       /* enable the GPIO pins for digital function */
+    //    GPIO_PORTC_DR2R_R |= 0x00000000 ;   /* 1 -> The corresponding GPIO pin has 2-mA drive */
+    //
+    //    GPIO_PORTC_DR4R_R |= 0x00000000 ;   /* 1 -> The corresponding GPIO pin has 4-mA drive */
+    //
+    //    GPIO_PORTC_DR8R_R |= 0x00000000 ;   /* 1 -> The corresponding GPIO pin has 8-mA drive */
+    //
+    //    GPIO_PORTC_ODR_R |= 0x00 ;    /* 1 -> The corresponding pin is configured as open drain */
+    //
+        GPIO_PORTC_DEN_R |= 0xF0;       /* enable the GPIO pins for digital function */
 
-    GPIO_PORTC_PUR_R |= 0xF0 ;    /* 1 -> The corresponding pin's weak pull-up resistor is enabled */
-//
-//    GPIO_PORTC_PDR_R |= 0x00 ;    /* 1 -> The corresponding pin's weak pull-down resistor is enabled */
-
+        GPIO_PORTC_PUR_R |= 0xF0 ;    /* 1 -> The corresponding pin's weak pull-up resistor is enabled */
+    //
+    //    GPIO_PORTC_PDR_R |= 0x00 ;    /* 1 -> The corresponding pin's weak pull-down resistor is enabled */
 
 
-    //GPIO_PORTC_DATA_R |= 0x00 ;
 
-    /* INTERRUPTS on PORT C */
+        //GPIO_PORTC_DATA_R |= 0x00 ;
 
-    NVIC_PRI0_R |= (NVIC_PRI0_R & 0xFF1FFFFF) | 0x00A00000 ; /*  priority 5 */
+        /* INTERRUPTS on PORT C */
 
-    NVIC_EN0_R |= 0x00000004;        /*  Enable interrupt 2 in NVIC */
+        NVIC_PRI0_R |= (NVIC_PRI0_R & 0xFF1FFFFF) | 0x00A00000 ; /*  priority 5 */
 
-    GPIO_PORTC_IS_R &= ~0xF0 ;      /* 0 -> The edge on the corresponding pin is detected (edge-sensitive)
-                                       1 -> The level on the corresponding pin is detected (level-sensitive)*/
+        NVIC_EN0_R |= 0x00000004;        /*  Enable interrupt 2 in NVIC */
 
-    GPIO_PORTC_IBE_R &= ~0xF0 ;     /* 0 -> Interrupt generation is controlled by the GPIO Interrupt Event (GPIOIEV) register (see page 666).
-                                       1 -> Both edges on the corresponding pin trigger an interrupt */
+        GPIO_PORTC_IS_R &= ~0xF0 ;      /* 0 -> The edge on the corresponding pin is detected (edge-sensitive)
+                                           1 -> The level on the corresponding pin is detected (level-sensitive)*/
 
-    GPIO_PORTC_IEV_R &= ~0xF0 ;     /* 0 -> A falling edge or a Low level on the corresponding pin triggers an interrupt.
-                                       1 -> A rising edge or a High level on the corresponding pin triggers an interrupt */
+        GPIO_PORTC_IBE_R &= ~0xF0 ;     /* 0 -> Interrupt generation is controlled by the GPIO Interrupt Event (GPIOIEV) register (see page 666).
+                                           1 -> Both edges on the corresponding pin trigger an interrupt */
 
-    GPIO_PORTC_IM_R |= 0xF0 ;       /* 0 -> The interrupt from the corresponding pin is masked.
-                                       1 -> The interrupt from the corresponding pin is sent to the interrupt controller */
+        GPIO_PORTC_IEV_R &= ~0xF0 ;     /* 0 -> A falling edge or a Low level on the corresponding pin triggers an interrupt.
+                                           1 -> A rising edge or a High level on the corresponding pin triggers an interrupt */
 
-    GPIO_PORTC_ICR_R |= 0xF0 ;      /* 0 -> The corresponding interrupt is unaffected.
-                                       1 -> The corresponding interrupt is cleared */
+        GPIO_PORTC_IM_R |= 0xF0 ;       /* 0 -> The interrupt from the corresponding pin is masked.
+                                           1 -> The interrupt from the corresponding pin is sent to the interrupt controller */
+
+        GPIO_PORTC_ICR_R |= 0xF0 ;      /* 0 -> The corresponding interrupt is unaffected.
+                                           1 -> The corresponding interrupt is cleared */
 }
 
 void GPIOD_INIT(void)
@@ -306,6 +332,7 @@ void GPIOD_INIT(void)
 //
 //    GPIO_PORTD_ICR_R |= 0xFF ;      /* 0 -> The corresponding interrupt is unaffected.
 //                                       1 -> The corresponding interrupt is cleared */
+    uart0_send_str("d FINISH\n");
 }
 
 void GPIOE_INIT(void)

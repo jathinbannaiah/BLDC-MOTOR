@@ -17,17 +17,21 @@
 
 void M1PWM5_init(int freq)
 {
+    uart0_send_str("START");
     // Enable the necessary clocks
     SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;  // Enable PWM1
     while((SYSCTL_RCGCPWM_R & SYSCTL_RCGCPWM_R1)==0){};
+    uart0_send_str("W1");
     SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R5; // Enable GPIO Port F
     while((SYSCTL_RCGCGPIO_R & SYSCTL_RCGCGPIO_R5)==0){};
+    uart0_send_str("W2");
     SYSCTL_RCC_R |= (SYSCTL_RCC_USEPWMDIV | SYSCTL_RCC_PWMDIV_4);  // Set PWM clock divisor
 
     // Configure GPIO PF1
     GPIO_PORTF_AFSEL_R |= 0x02;  // Enable alternate function for PF1
     GPIO_PORTF_PCTL_R |= GPIO_PCTL_PF1_M1PWM5;  // Configure PF1 as M1PWM5
     GPIO_PORTF_DEN_R |= 0x02;  // Enable digital functionality for PF1
+    uart0_send_str("w3");
 
     // Configure PWM1 Generator 2
     PWM1_2_CTL_R &= ~0x00000001;  // Disable PWM1 Generator 2 during configuration
@@ -35,6 +39,7 @@ void M1PWM5_init(int freq)
     PWM1_2_INTEN_R = (PWM_0_INTEN_TRCNTLOAD | PWM_0_INTEN_INTCNTLOAD);  // Enable interrupts
     PWM1_2_GENB_R = 0x000000B0;  // Configure for PWM down-count mode with immediate updates
     PWM1_2_LOAD_R = (125000 / freq);  // Set the load value for the desired frequency
+    uart0_send_str("w4");
 
     float dutycycle_init = 0.5;
     PWM1_2_CMPA_R = (1 - dutycycle_init) * (PWM1_2_LOAD_R);  // Set the initial duty cycle
@@ -42,6 +47,7 @@ void M1PWM5_init(int freq)
     // Enable PWM1 Generator 2
     PWM1_2_CTL_R |= 0x00000001;
     PWM1_ENABLE_R |= 0x20;  // Enable PWM output for M1PWM5
+    uart0_send_str("w5");
 }
 inline void M1PWM5_start(void)
 {
