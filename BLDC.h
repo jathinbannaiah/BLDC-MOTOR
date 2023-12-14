@@ -2,7 +2,7 @@
  * BLDC.h
  *
  *  Created on: 07-Sep-2023
- * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
+ *      Author: Sarvjit
  */
 
 #ifndef BLDC_H_
@@ -12,7 +12,6 @@
 
 
 
-#endif /* BLDC_H_ */
 
 //#include <stdint.h>
 
@@ -20,69 +19,111 @@
 
 //#include <stdlib.h>
 
-#include "inc/tm4c123gh6pm.h"
-
-//RECOATER MOTOR
-#define START 0x00000020      //B5
-                                                         //PE4 for PWM
-#define BRAKE 0x00000010      //B4
-
-#define DIR 0x00000008        //B3
-
-#define M0 0x00000004         //B2
-
-#define M1 0x00000002         //B1
-
-#define ALMRST 0x00000001     //B0
-
-// ROLLER MOTOR
-#define START_R 0x00000001    //D0                      //We can use A port because it is interfering with uart communication
-                                                        //Using PF1 for PWM signal (the led on the tiva will glow red becuase pf1 is configured to it)
-#define BRAKE_R 0x00000002    //D1
-                                                        //Using PF1 to use a different PWM module
-#define DIR_R 0x00000004      //D2
-
-#define M0_R 0x00000008       //D3
-
-#define M1_R 0x00000040       //D6
-
-#define ALMRST_R 0x00000080   //D7
+#include "D:/ti/TivaWare_C_Series-2.2.0.295/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h"
 
 
-//RECOATER FUNCTIONS
-void BLDC_INIT(int mode);
+#ifndef GPIO_H_
+#include"GPIO.h"
+#endif
 
-void Inst_Stop();
+#ifndef PWM_H_
+#include"PWM.h"
+#endif
 
-void Dec_Stop();
+#ifndef UART_H_
+#include"UART.h"
+#endif
 
-void Start();
+#define PWM_FRE 2000
 
-void Brake();
+#define START 0x00000080        //PA7
 
-void Run_FW();
+#define BRAKE 0x00000040        //PA6
 
-void Run_RV();
+#define DIR 0x00000020          //PA5
 
-void Change_DIR(int dir);
+#define M0 0x00000010           //PA4
 
-void set_Mode(int mode);
+#define M1 0x00000008           //PA3
 
-//ROLLER FUNCTIONS
-void BLDC_INIT_R(int mode);
+#define ALMRST 0x00000004       //PA2
 
-void Inst_Stop_R();
+#define R_distance 500
 
-void Dec_Stop_R();
+#define t_distance 20
 
-void Start_R();
+#define PITCH 10                 // Pitch of gears and belt ( distance / No of Revolutions )
 
-void Brake_R();
+#define G_Ratio 10              // Gear Ration: To be multiplied to RPM
+/*
+ * Roller
+ * VH VM VL -> PE4 PWM M0PWM4_init
+ * */
 
-void Run_FW_R();
+/*
+ * Recoater
+ * VH VM VL -> PE5 PWM M0PWM5_init
+ * */
+void Recoater_BLDC_INIT(int mode);
 
-void Run_RV_R();
+void Recoater_Set_RPM(int RPM);
 
-void Change_DIR_R(int dir);
+void Recoater_Inst_Stop();
 
-void set_Mode_R(int mode);
+void Recoater_Dec_Stop();
+
+void Recoater_Start();
+
+void Recoater_Brake();
+
+void Recoater_Move_Left();
+
+void Recoater_Move_Right();
+
+void Recoater_Change_DIR(int dir);
+
+void Recoater_set_Mode(int mode);
+
+void Recoater_Go_Left(int rpm);
+
+void Recoater_Go_Right(int rpm);
+
+void calculate_time(int curr_RPM, int slow_rpm, int* T_A, int* T_T);
+
+/* Roller */
+void Roller_BLDC_INIT(int mode);
+
+void Roller_Set_RPM(int RPM);
+
+void Roller_Inst_Stop();
+
+void Roller_Dec_Stop();
+
+void Roller_Start();
+
+void Roller_Brake();
+
+void Roller_Run_FW();
+
+void Roller_Run_RV();
+
+void Roller_Change_DIR(int dir);
+
+void Roller_set_Mode(int mode);
+
+//const int R_distance = 500 ;        // Recoater active distance
+
+//const int t_distance = 100 ;         // Distance for which speed should gradually increase/decrease
+
+int T_active, T_tap ;
+
+extern unsigned long ms_counter ;
+
+//char *command[] ;
+
+//void (*command_execute[])(int RPM) ;
+
+int size_c ;
+
+#endif /* BLDC_H_ */
+

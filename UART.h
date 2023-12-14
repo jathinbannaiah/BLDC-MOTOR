@@ -26,7 +26,7 @@
 
 #ifndef tm4c123gh6pm_H
 #define tm4c123gh6pm_H /*header definition starts here*/
-#include "inc/tm4c123gh6pm.h"
+#include "D:/ti/TivaWare_C_Series-2.2.0.295/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h"
 #endif /* header file ends here*/
 
 #ifndef interrupt_h

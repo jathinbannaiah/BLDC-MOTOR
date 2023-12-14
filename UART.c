@@ -126,7 +126,7 @@ void Uart0_RX_Handler(void)
         BUF0_Counter = 0 ;
 //        uart0_send_str(RX0_BUF);
     }
-    uart0_send_char(RX0_DATA);
+    uart1_send_char(RX0_DATA);
 }
 
 /* UART1 */

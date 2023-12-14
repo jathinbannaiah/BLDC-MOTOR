@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-#include "inc/tm4c123gh6pm.h"
+#include "D:/ti/TivaWare_C_Series-2.2.0.295/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h"
 
 #define PWM_FREQ 1000
 

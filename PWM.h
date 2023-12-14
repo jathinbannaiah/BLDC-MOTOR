@@ -2,7 +2,7 @@
  * PWM.h
  *
  *  Created on: 15-Apr-2023
- * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
+ *      Author: Sarvjit
  */
 
 #ifndef PWM_H_
@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 
-#include "inc/tm4c123gh6pm.h"
+#include "D:/ti/TivaWare_C_Series-2.2.0.295/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h"
 
 //void PWM_0_SYNC(void);
 //
@@ -26,17 +26,7 @@
 //void PWM_Stop(void);
 
 
-//Module 1 PWM5
-
-void M1PWM5_init(int freq);
-
-void M1PWM5_start(void);
-
-void M1PWM5_stop(void);
-
-void M1PWM5_set(float dutycycle);
-
-void M1PWM5_set_freq(int freq);
+void PWM_Init(int freq);
 
 /*Module 0 PWM2*/
 

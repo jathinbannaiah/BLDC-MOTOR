@@ -1,10 +1,11 @@
 /*
- * L298N H Bridge Driver using PWM
- * Authors: Sarvjit Ajit Patil and Praveen Bannaiah
- * Date : 08/08/2023
+ * Recoater & Roller BLDC
+ * Sarvjit Ajit Patil 20862
+ * Date : 10/11/2023
  */
 
-//DON'T USE PORT A FOR ANYTHING BECUASE IT IS BEING USED FOR UART
+
+
 /*
  * main.c
  */
@@ -16,7 +17,7 @@
 
 #include <stdlib.h>
 
-#include "inc/tm4c123gh6pm.h"
+#include "D:/ti/TivaWare_C_Series-2.2.0.295/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h"
 
 #include"SysTick.h"
 
@@ -44,9 +45,9 @@
 //#include"timer.h"
 //#endif
 
-//#ifndef STEPPER_H_
-//#include"stepper.h"
-//#endif
+#ifndef STEPPER_H_
+#include"stepper.h"
+#endif
 
 #ifndef BLDC_H_
 #include"BLDC.h"
@@ -55,6 +56,57 @@
 //#define DEBUG
 
 // #include"ultrasonic.h"
+
+
+char *command[] = {
+
+                   "Roller_FW",
+                   "Roller_RV",
+                   "Roller_STOP_IN",
+                   "Roller_STOP_DC",
+                   "Roller_START",
+                   "Roller_RUN_FW",
+                   "Roller_RUN_RV",
+                   "Roller_BRAKE",
+                   "Roller_RPM",
+                   "Recoater_FW",
+                   "Recoater_RV",
+                   "Recoater_STOP_IN",
+                   "Recoater_STOP_DC",
+                   "Recoater_START",
+                   "Recoater_RUN_FW",
+                   "Recoater_RUN_RV",
+                   "Recoater_BRAKE",
+                   "Recoater_Go_Left",
+                   "Recoater_Go_Right",
+                   "Recoater_RPM"
+
+};
+
+void (*command_execute[])(int RPM) = {
+
+                                      Roller_Change_DIR,            // Roller_FW
+                                      Roller_Change_DIR,            // Roller_RV
+                                      Roller_Inst_Stop,             // Roller_STOP_IN
+                                      Roller_Dec_Stop,              // Roller_STOP_DC
+                                      Roller_Start,                 // Roller_START
+                                      Roller_Run_FW,                // Roller_RUN_FW
+                                      Roller_Run_RV,                // Roller_RUN_RV
+                                      Roller_Brake,                 // Roller_BRAKE
+                                      Roller_Set_RPM,               // Roller_RPM
+                                      Recoater_Change_DIR,          // Recoater_FW
+                                      Recoater_Change_DIR,          // Recoater_RV
+                                      Recoater_Inst_Stop,           // Recoater_STOP_IN
+                                      Recoater_Dec_Stop,            // Recoater_STOP_DC
+                                      Recoater_Start,               // Recoater_START
+                                      Recoater_Move_Left,           // Recoater_RUN_FW
+                                      Recoater_Move_Right,          // Recoater_RUN_RV
+                                      Recoater_Brake,               // Recoater_BRAKE
+                                      Recoater_Go_Left,             // Recoater_Go_Left
+                                      Recoater_Go_Right,            // Recoater_Go_Right
+                                      Recoater_Set_RPM              // Recoater_RPM
+
+};
 
 void delayMs(int n);
 
@@ -76,142 +128,9 @@ float pos = 0 ;
 long cur_cnt = 0 ;
 char str[100] ;
 
-int f1,f2,f3,f4,f5,f6,f7,f8,f9,f10;
-
-#define DEBOUNCE_DELAY 25 // Adjust this value as needed
-
-//int limitSwitch1Clicked = 0;  // Flag to track the state of limit switch 1
-//int limitSwitch2Clicked = 0;  // Flag to track the state of limit switch 2
-
-volatile int switch1State = 0;
-volatile int switch2State = 0;
-volatile int switch1Counter = 0;
-volatile int switch2Counter = 0;
-
-
+int i_rpm ;
 
 extern void PWM_Start(void);
-
-//void LimitSwitch_interrupt()
-//{
-//        uart0_send_str("Interrupt called");
-//    // Check which pin triggered the interrupt
-//        if (GPIO_PORTB_MIS_R & 0x40) {
-//            switch1Counter = DEBOUNCE_DELAY;
-//        }
-//        else if (GPIO_PORTB_MIS_R & 0x80) {
-//            switch2Counter = DEBOUNCE_DELAY;
-//        }
-//
-//        // Clear the interrupt flag
-//        GPIO_PORTB_ICR_R |= 0x40 | 0x80;
-//
-//}
-
-//void DebounceLimitSwitches(void) {
-//    //uart0_send_str("debouncing function");
-//    if (switch1Counter > 0) {
-//        uart0_send_str("dec 1");
-//        switch1Counter--;
-//
-//        if (switch1Counter == 0) {
-//            uart0_send_str("0 1");
-//            int rawState = (((GPIO_PORTB_DATA_R >> 6) & 0x1) == 0);
-//
-//            if (rawState == switch1State) {
-//                if (switch1State == 1) {
-//                    // Switch 1 is pressed, perform action
-//                    // e.g., Brake();
-//                    uart0_send_str("Limit switch 1 clicked");
-//                    Brake();
-//                    Brake_R();
-//                }
-//            } else {
-//                switch1State = rawState;
-//            }
-//        }
-//    }
-//
-//    if (switch2Counter > 0) {
-//        uart0_send_str("dec 2");
-//        switch2Counter--;
-//
-//        if (switch2Counter == 0) {
-//            uart0_send_str("0 2");
-//            int rawState = (((GPIO_PORTB_DATA_R >> 7) & 0x1) == 0);
-//
-//            if (rawState == switch2State) {
-//                if (switch2State == 1) {
-//                    // Switch 2 is pressed, perform action
-//                    // e.g., Brake();
-//                    uart0_send_str("Limit switch 2 clicked");
-//                    Brake();
-//                    Brake_R();
-//                }
-//            } else {
-//                swDIRitch2State = rawState;
-//            }
-//        }
-//    }
-//}
-
-void DebounceSwitch1() {
-    // Read the raw switch state
-    int rawState;
-    if (((GPIO_PORTB_DATA_R >> 6) & 0x1) == 0)
-            rawState = 1;
-    else
-            rawState = 0;
-
-    if (rawState == switch1State) {
-        // If the raw state matches the debounced state, reset the counter
-        switch1Counter = 0;
-    } else {
-        // If the raw state is different, increment the counter
-        switch1Counter++;
-
-        if (switch1Counter >= DEBOUNCE_DELAY) {
-            // If the counter exceeds the debounce delay, update the debounced state
-            switch1State = rawState;
-            if (switch1State == 1) {
-                // Switch is pressed, perform action
-                uart0_send_str("L1\n");
-                Brake();
-                Brake_R();
-
-            }
-        }
-    }
-}
-
-void DebounceSwitch2() {
-    // Read the raw switch state
-    int rawState;
-
-    if (((GPIO_PORTB_DATA_R >> 7) & 0x1) == 0)
-        rawState = 1;
-    else
-        rawState = 0;
-
-    if (rawState == switch2State) {
-        // If the raw state matches the debounced state, reset the counter
-        switch2Counter = 0;
-    } else {
-        // If the raw state is different, increment the counter
-        switch2Counter++;
-
-        if (switch2Counter >= DEBOUNCE_DELAY) {
-            // If the counter exceeds the debounce delay, update the debounced state
-            switch2State = rawState;
-            if (switch2State == 1) {
-                // Switch is pressed, perform action
-                uart0_send_str("L2 \n");
-                Brake();
-                Brake_R();
-            }
-        }
-    }
-}
 
 int main(void)
 {
@@ -220,7 +139,7 @@ int main(void)
     Systick_init();
 //    GPIOA_INIT();
 //    GPIOB_INIT();
-//    GPIOC_INIT();
+    GPIOC_INIT();   /* Limit Switches */
 //    GPIOD_INIT();
 //    GPIOE_INIT();
 //    GPIOF_INIT();
@@ -228,14 +147,10 @@ int main(void)
 //    TIMER0_INIT();
 
     uart0_init();
-//    uart1_init();
-
-    uart0_send_str("Welcome to UART0\n");
-    uart0_send_str("This is for debugging.\n");
-
-    BLDC_INIT(0);
-    BLDC_INIT_R(0);
-
+    uart1_init();
+//
+    uart1_send_str("Welcome to UART1\n");
+    uart1_send_str("This is for debugging.\n");
 
 
 //    Run_FW();
@@ -248,29 +163,23 @@ int main(void)
 
 //    PWM_0_SYNC() ;
 
-    float set_duty = 0.9 ;
-    float set_duty_R = 0.9 ;
-/* PWM is used as it triggers the ADC */
-    M0PWM4_init(PWM_FRE);
-    uart0_send_str("pWM1");
-    M0PWM5_init(PWM_FRE);
-    uart0_send_str("pWM2");
-    M1PWM5_init(PWM_FRE);
-    uart0_send_str("pWM3");
+//    PWM_Init(PWM_FRE);
 
-    M0PWM4_set(90/100);
-    uart0_send_str("pWM4");
-    M0PWM4_set(set_duty);
-    uart0_send_str("pWM5");
 
-    M0PWM5_set(90/100);
-    uart0_send_str("pWM6");
-    M0PWM5_set(set_duty_R);
-    uart0_send_str("pWM7");
+//    float set_duty = 0.9 ;
+//
+//    M0PWM4_init(PWM_FRE);
+//    M0PWM5_init(PWM_FRE);
+//
+//    M0PWM4_set(90/100);
+//    M0PWM4_set(set_duty);
 
-    M1PWM5_set(90/100);
-    M1PWM5_set(set_duty_R);
-    uart0_send_str("pWM");
+    Recoater_BLDC_INIT(0);
+    Roller_BLDC_INIT(0);
+
+    char rpm[4];
+
+    size_c = sizeof(command)/sizeof(char*);
 
 //    M0PWM4_start();
 //    M0PWM5_start();
@@ -292,249 +201,70 @@ int main(void)
 
 //    ADC_1_SS_1_INIT();
 
-
-
-    uart0_send_str("Starting to read commands: \n");
+    i_rpm = 120;
 
     while(1)
     {
-       /*
-        if ((((GPIO_PORTB_DATA_R >> 6) & 0x1) == 0) && (limitSwitch1Clicked == 0))           //Checking PB6 pin
-        {
-            uart0_send_str("Limit switch 1 clicked \n");
-            Brake();                                       //Not using interrupts because it will stop other motors running on the board as well
-            Brake_R();
-            limitSwitch1Clicked = 1;
-        }
-        else if (((GPIO_PORTB_DATA_R >> 6) & 0x1) == 1)
-        {
-            limitSwitch1Clicked = 0;
-        }
-        if ((((GPIO_PORTB_DATA_R >> 7) & 0x1) == 0) && (limitSwitch2Clicked == 0))            //Checking PB7 pin
-        {
-            uart0_send_str("Limit switch 2 clicked \n");
-            Brake();                                       //Not using interrupts because it will stop other motors running on the board as well
-            Brake_R();
-            limitSwitch2Clicked = 1;
-        }
-        else if (((GPIO_PORTB_DATA_R >> 7) & 0x1) == 1)
-        {
-            limitSwitch2Clicked = 0;
-        }
-        */
-//        DebounceLimitSwitches();
-        DebounceSwitch1();
-        DebounceSwitch2();
         if ( rx0_command_flag )
         {
-//            uart0_send_str(RX0_BUF);
-//            uart0_send_char('\n');
+            uart1_send_str(RX0_BUF);
+            uart1_send_char('\n');
 
-            if(compare_str(RX0_BUF,"FW"))
+
+            for(int i = 0; i < sizeof(RX0_BUF); i++)
             {
-                Change_DIR(1);
-            }
-
-            else if(compare_str(RX0_BUF,"R FW"))
-            {
-                Change_DIR_R(1);
-            }
-
-            else if(compare_str(RX0_BUF,"RV"))
-            {
-                Change_DIR(0);
-            }
-
-            else if(compare_str(RX0_BUF,"R RV"))
-            {
-                Change_DIR_R(0);
-            }
-
-            else if(compare_str(RX0_BUF,"STOP IN"))
-            {
-                Inst_Stop();
-            }
-
-            else if(compare_str(RX0_BUF,"R STOP IN"))
-            {
-                Inst_Stop_R();
-            }
-
-            else if(compare_str(RX0_BUF,"STOP DC"))
-            {
-                Dec_Stop();
-            }
-
-            else if(compare_str(RX0_BUF,"R STOP DC"))
-            {
-                Dec_Stop_R();
-            }
-
-            else if(compare_str(RX0_BUF,"START"))
-            {
-                Start();
-            }
-
-            else if(compare_str(RX0_BUF,"R START"))
-            {
-
-                Start_R();
-            }
-
-            else if(compare_str(RX0_BUF,"RUN FW"))
-            {
-                Run_FW();
-            }
-
-            else if(compare_str(RX0_BUF,"R RUN FW"))
-            {
-                Run_FW_R();
-            }
-
-            else if(compare_str(RX0_BUF,"RUN RV"))
-            {
-                Run_RV();
-//                M0PWM4_set(0.5);
-//                M0PWM5_set(0.5);
-            }
-
-            else if(compare_str(RX0_BUF,"R RUN RV"))
-            {
-                Run_RV_R();
-            }
-
-            else if(compare_str(RX0_BUF,"BRAKE"))
-            {
-                Brake();
-            }
-
-            else if(compare_str(RX0_BUF,"R BRAKE"))
-            {
-                Brake_R();
-            }
-
-            char cmd[3];
-
-            for(int i = 0; i < 3; i++)
-            {
-                cmd[i] = RX0_BUF[i];
-            }
-
-            if(compare_str(cmd,"RPM"))     //Upper case RPM for Re-coater control
-            {
-                //uart0_send_str("RPM\n");
-                //uart0_send_str(cmd);
-                //uart0_send_char('\n');
-                uart0_send_str("setting RPM to Motor 1\n");
-
-                char rpm[4] = {'\0'};
-                for(int i = 0; i < 4; i++)
+                if(RX0_BUF[i] == ' ')
                 {
-                    rpm[i] = RX0_BUF[i+4];
+                    RX0_BUF[i] = '\0';
                 }
-
-                //uart0_send_str(rpm);
-                //uart0_send_char('\n');
-
-                int i_rpm = atoi(rpm);
-                //sprintf(str,"RPM: %d\n", i_rpm);
-                //uart0_send_str(str);
-
-                float f_rpm = map(i_rpm,100, 3150, 0.12, 0.97);
-//                float f_rpm;
-//                f_rpm = i_rpm/100;
-
-                sprintf(str,"RPM(map): %d\n", i_rpm);
-                uart0_send_str(str);
-
-                int ii_f_rpm = f_rpm * 100 ;
-                int i_f_rpm = ii_f_rpm / 100 ;
-                int f_f_rpm = ii_f_rpm % 100 ;
-
-                sprintf(str,"RPM(float): %d.%d\n", i_f_rpm, f_f_rpm);
-                uart0_send_str(str);
-
-                M0PWM4_set(f_rpm);
-
-//                for(int i = 0; i < 3; i++)
-//                {
-//                    RX0_BUF[i] = '\0';
-//                    cmd[i] = '\0' ;
-//                }
-//                for(int i = 0; i < 4; i++)
-//                {
-//                    RX0_BUF[i] = '\0';
-//                    rpm[i] = '\0' ;
-//                }
-
-                for(int i = 0; i < 4; i++)
-                {
-                    rpm[i] = '\0';
-                }
-                i_rpm = '\0';
-                f_rpm = '\0';
             }
 
+            uart1_send_str(RX0_BUF);
+            uart1_send_char('\n');
 
-            else if(compare_str(cmd,"rpm"))     //Lower case RPM for Re-coater control
+            for(int i = 0; i < size_c; i++)
             {
-                //uart0_send_str("RPM Roller Control\n");
-                //uart0_send_str(cmd);
-                //uart0_send_char('\n');
-                uart0_send_str("setting RPM to Motor 2\n");
-
-                char r[4] = {'\0'};
-                for(int j = 0; j < 4; j++)
+                if(compare_str(RX0_BUF, command[i]))
                 {
-                    //sprintf(str,"jj %c", r[j]);
-                    //uart0_send_str(str);
-                    r[j] = RX0_BUF[j+4];
-                    //uart0_send_char('\n');
+                    uart0_send_str("\nOK\n\r");
+                    sprintf(str,"Command no: %d\n\r Command: %s\n\r", i, command[i]);
+                    uart1_send_str(str);
+
+                    if((i == 8) || (i==19))
+                    {
+                        for(int i = 0; i < 4; i++)
+                        {
+                            rpm[i] = RX0_BUF[i+13];
+                        }
+
+                        //                uart1_send_str("\nRPM:");
+                        //                uart1_send_str(rpm);
+                        //                uart1_send_char('\n');
+
+                        i_rpm = atoi(rpm);
+                    }
+
+                    (*command_execute[i])(i_rpm);
+
+                    sprintf(str,"Ex%d\n\r", i);
+                    uart0_send_str(str);
+
                 }
-
-                //uart0_send_str(r);
-                //uart0_send_char('\n');
-
-                int i_rpm_r = atoi(r);
-                //sprintf(str,"RPM Roller: %d\n", i_rpm_r);
-                //uart0_send_str(str);
-
-                float f_rpm_r = map(i_rpm_r,100, 3150, 0.12, 0.97);
-//                float f_rpm;     M0PWM5_set(f_rpm);
-//                f_rpm = i_rpm/100;
-
-                sprintf(str,"RPM(map) Roller: %d\n", i_rpm_r);
-                uart0_send_str(str);
-
-                int ii_f_rpm_r = f_rpm_r * 100 ;
-                int i_f_rpm_r = ii_f_rpm_r / 100 ;
-                int f_f_rpm_r = ii_f_rpm_r % 100 ;
-
-                sprintf(str,"RPM(float) Roller: %d.%d\n", i_f_rpm_r, f_f_rpm_r);
-                uart0_send_str(str);
-
-                M1PWM5_set(f_rpm_r);
-
-//                for(int i = 0; i < 3; i++)
-//                {
-//                    RX0_BUF[i] = '\0';
-//                    cmd[i] = '\0' ;
-//                }
-//                for(int i = 0; i < 4; i++)
-//                {
-//                    RX0_BUF[i] = '\0';
-//                    rpm[i] = '\0' ;
-//                }
             }
 
-            for(int i = 0; i < 10; i++)
+            for(int i = 0; i < sizeof(rpm); i++)
             {
-                RX0_BUF[i] = '0';
+                rpm[i] = '\0';
             }
+
+            for(int i = 0; i < sizeof(RX0_BUF); i++)
+            {
+                RX0_BUF[i] = '\0';
+            }
+
+
 
             rx0_command_flag = 0 ;
-//            M0PWM4_set(0.5);
-//            M0PWM5_set(0.5);
 
         }
         WaitForInterrupt();

@@ -19,6 +19,8 @@ unsigned int CAP_VAL_RISE = 0, CAP_VAL_FALL = 0;
 
 unsigned int old_CAP_VAL_RISE = 0;
 
+volatile int position_cnt = 0;
+
 void TIMER0_INIT(void)
 {
 
@@ -30,36 +32,73 @@ void TIMER0_INIT(void)
 
     while((SYSCTL_PRTIMER_R & 0x01) == 0){}; // Wait for clock to stabilize
 
-    SYSCTL_RCGCGPIO_R |= 0x00000002 ;    /* Enable and provide a clock to GPIO Port_B_ in Run mode */
-
-    SYSCTL_RCGC2_R |= 2;            /* enable clock to PORTB */
-
-    while((SYSCTL_PRGPIO_R & 0x02) == 0){}; // Wait for clock to stabilize
-
-    GPIO_PORTB_DIR_R &= ~0x40;      /* make PB6 an input pin */
-
-    GPIO_PORTB_DEN_R |= 0x40;       /* make PB6 as digital pin */
-
-    GPIO_PORTB_AFSEL_R |= 0x40;     /* use PB6 alternate function */
-
-    GPIO_PORTB_PCTL_R &= ~0x0F000000; /* configure PB6 for T0CCP0 */
-
-    GPIO_PORTB_PCTL_R |= 0x07000000;
+//    SYSCTL_RCGCGPIO_R |= 0x00000002 ;    /* Enable and provide a clock to GPIO Port_B_ in Run mode */
+//
+//    SYSCTL_RCGC2_R |= 2;            /* enable clock to PORTB */
+//
+//    while((SYSCTL_PRGPIO_R & 0x02) == 0){}; // Wait for clock to stabilize
+//
+//    GPIO_PORTB_DIR_R &= ~0x40;      /* make PB6 an input pin */
+//
+//    GPIO_PORTB_DEN_R |= 0x40;       /* make PB6 as digital pin */
+//
+//    GPIO_PORTB_AFSEL_R |= 0x40;     /* use PB6 alternate function */
+//
+//    GPIO_PORTB_PCTL_R &= ~0x0F000000; /* configure PB6 for T0CCP0 */
+//
+//    GPIO_PORTB_PCTL_R |= 0x07000000;
 
     TIMER0_CTL_R &= ~ TIMER_CTL_TAEN ;      /* Disable Timer 0 */
 
-    TIMER0_CFG_R |= TIMER_CFG_16_BIT ;      /* 16-bit timer */
+    TIMER0_CFG_R = TIMER_CFG_32_BIT_TIMER ;      /* 32-bit timer */
 
-    TIMER0_TAMR_R &= ~ 0x00000004 ;  /* Edge-Count mode */
+//    TIMER0_TAMR_R &= ~ 0x00000004 ;  /* Edge-Count mode */
 
 
-    TIMER0_TAMR_R |= ( TIMER_TAMR_TAMR_CAP ) ;  /* Capture Mode, Up-count */
+    TIMER0_TAMR_R |= ( TIMER_TAMR_TAMR_PERIOD ) ;  /*  Mode, Down-count */
 
-    TIMER0_TAMATCHR_R = 0x07FF;  /* set the count limit */
+//    TIMER0_TAILR_R = (16000 * 10) - 1 ;
 
-    TIMER0_CTL_R &= ~0x0000000C ;    /* Positive Edge */
+//    TIMER0_TAMATCHR_R = 0x07FF;  /* set the count limit */
 
+//    TIMER0_CTL_R &= ~0x0000000C ;    /* Positive Edge */
+
+//    TIMER0_CTL_R |= TIMER_CTL_TAEN ;
+
+
+    TIMER0_IMR_R |= TIMER_IMR_TATOIM ;
+
+    EnableInterrupts();
+
+    NVIC_EN0_R |= 0x00080000;   /* enable IRQ19  */
+
+    NVIC_PRI4_R |= (NVIC_PRI4_R & 0x1FFFFFFF) | 0x50000000 ; /*  priority 3 */
+
+    TIMER0_ICR_R |= TIMER_IMR_TATOIM ;
+
+}
+
+inline void set_TIMER0_L(float cnt)
+{
+    TIMER0_TAILR_R = (16 * cnt) - 1 ;
+}
+
+inline void start_TIMER0_A()
+{
     TIMER0_CTL_R |= TIMER_CTL_TAEN ;
+}
+
+inline void stop_TIMER0_A()
+{
+    TIMER0_CTL_R &= ~ TIMER_CTL_TAEN ;      /* Disable Timer 0 */
+}
+
+void TIMER_0_A_Handler(void)
+{
+//    GPIO_PORTF_DATA_R ^= 0x0E ;
+
+    TIMER0_ICR_R |= TIMER_IMR_TATOIM ;
+
 }
 
 inline void set_TIMER0_cnt(long cnt)

@@ -16,19 +16,15 @@
 
 #include <stdint.h>
 
-#include "inc/tm4c123gh6pm.h"
+#include "D:/ti/TivaWare_C_Series-2.2.0.295/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h"
 
-#define X_DIR 0x04
+#include "BLDC.h"
 
-#define Y_DIR 0x08
+#include "UART.h"
 
-#define Z_DIR 0x10
+#define Recoater_Left 0x10
 
-#define X_EN  0x20
-
-#define Y_EN  0x40
-
-#define Z_EN  0x80
+#define Recoater_Right 0x20
 
 void GPIOA_INIT(void);
 
